@@ -1,0 +1,160 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <limits>
+using namespace std;
+
+char board[3][3];
+char playerMark, computerMark;
+
+void resetBoard() {
+    char num = '1';
+    for (int i = 0; i < 3; ++i)
+        for (int j = 0; j < 3; ++j)
+            board[i][j] = num++;
+}
+
+void displayBoard() {
+    cout << "\n";
+    for (int i = 0; i < 3; i++) {
+        cout << " ";
+        for (int j = 0; j < 3; j++) {
+            cout << board[i][j];
+            if (j < 2) cout << " | ";
+        }
+        if (i < 2) cout << "\n---|---|---\n";
+    }
+    cout << "\n\n";
+}
+
+bool checkWin(char mark) {
+    for (int i = 0; i < 3; i++)
+        if ((board[i][0] == mark && board[i][1] == mark && board[i][2] == mark) ||
+            (board[0][i] == mark && board[1][i] == mark && board[2][i] == mark))
+            return true;
+    return (board[0][0] == mark && board[1][1] == mark && board[2][2] == mark) ||
+           (board[0][2] == mark && board[1][1] == mark && board[2][0] == mark);
+}
+
+bool isDraw() {
+    for (auto& row : board)
+        for (char cell : row)
+            if (cell != 'X' && cell != 'O') return false;
+    return true;
+}
+
+bool isValidMove(int choice) {
+    int r = (choice - 1) / 3, c = (choice - 1) % 3;
+    return choice >= 1 && choice <= 9 && board[r][c] != 'X' && board[r][c] != 'O';
+}
+
+void playerTurn() {
+    int choice;
+    while (true) {
+        cout << "👉 Player의 턴 (" << playerMark << "). 번호 선택 (1-9): ";
+        cin >> choice;
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "잘못된 입력! 숫자를 입력하세요.\n";
+            continue;
+        }
+        if (!isValidMove(choice)) {
+            cout << "잘못된 칸입니다. 다시 선택하세요.\n";
+            continue;
+        }
+        int r = (choice - 1) / 3, c = (choice - 1) % 3;
+        board[r][c] = playerMark;
+        break;
+    }
+}
+
+bool tryMove(char mark, int& r, int& c) {
+    for (int i = 1; i <= 9; ++i) {
+        int row = (i - 1) / 3, col = (i - 1) % 3;
+        if (board[row][col] != 'X' && board[row][col] != 'O') {
+            char temp = board[row][col];
+            board[row][col] = mark;
+            if (checkWin(mark)) {
+                board[row][col] = temp;
+                r = row; c = col;
+                return true;
+            }
+            board[row][col] = temp;
+        }
+    }
+    return false;
+}
+
+void computerTurn() {
+    cout << "💻 Computer의 턴 (" << computerMark << ")...\n";
+    int r, c;
+    if (tryMove(computerMark, r, c) || tryMove(playerMark, r, c)) {
+        board[r][c] = computerMark;
+        return;
+    }
+    while (true) {
+        int move = rand() % 9;
+        r = move / 3; c = move % 3;
+        if (board[r][c] != 'X' && board[r][c] != 'O') {
+            board[r][c] = computerMark;
+            return;
+        }
+    }
+}
+
+int main() {
+    srand(time(0));
+    int playerWins = 0, computerWins = 0, draws = 0;
+    string again;
+
+    cout << "🎮 틱택토 게임 시작!\n";
+
+    // 마크 선택
+    do {
+        cout << "X 또는 O 중 선택하세요 (Player 마크): ";
+        cin >> playerMark;
+        playerMark = toupper(playerMark);
+    } while (playerMark != 'X' && playerMark != 'O');
+
+    computerMark = (playerMark == 'X') ? 'O' : 'X';
+
+    do {
+        resetBoard();
+        bool isPlayerTurn = (playerMark == 'X');
+
+        while (true) {
+            displayBoard();
+            if (isPlayerTurn) playerTurn();
+            else computerTurn();
+
+            if (checkWin(playerMark) || checkWin(computerMark) || isDraw()) break;
+            isPlayerTurn = !isPlayerTurn;
+        }
+
+        // 승패 판정 및 출력
+        if (checkWin(playerMark)) {
+            displayBoard();
+            cout << "🎉 Player가 이겼습니다!\n";
+            playerWins++;
+        } else if (checkWin(computerMark)) {
+            displayBoard();
+            cout << "😈 Computer가 이겼습니다.\n";
+            computerWins++;
+        } else {
+            displayBoard();
+            cout << "🤝 무승부입니다!\n";
+            draws++;
+        }
+
+        cout << "🔁 다시 시작할까요? (y/n): ";
+        cin >> again;
+    } while (again == "y" || again == "Y");
+
+    cout << "\n📊 최종 전적\n";
+    cout << "Player 승리: " << playerWins << "회\n";
+    cout << "Computer 승리: " << computerWins << "회\n";
+    cout << "무승부: " << draws << "회\n";
+    cout << "👋 게임을 종료합니다. 감사합니다!\n";
+    return 0;
+}
