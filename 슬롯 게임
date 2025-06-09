@@ -1,0 +1,58 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <vector>
+using namespace std;
+
+// 슬롯 심볼 목록
+vector<string> symbols = { "😎", "💋", "🌈", "🍚", "💥" };
+
+// 무작위 심볼 하나 리턴
+string randomSymbol() {
+    return symbols[rand() % symbols.size()];
+}
+
+int main() {
+    srand(time(0));
+    int coins = 13;
+    int bet = 1;
+
+    cout << "🎰 슬롯머신 게임 시작! (1회당 코인 1개 차감)\n";
+    cout << "[ 목표 : 코인 30개 달성 시 승리! ]\n";
+
+    while (coins > 0) {
+        cout << "\n▶︎ Enter 키를 눌러 플레이 (현재 코인: " << coins << ")...";
+        cin.ignore();  // 엔터 대기
+
+        coins -= bet;
+
+        string s1 = randomSymbol();
+        string s2 = randomSymbol();
+        string s3 = randomSymbol();
+
+        cout << "🎰 결과: [ " << s1 << " | " << s2 << " | " << s3 << " ]\n";
+
+        // 보상 조건 처리
+        if (s1 == s2 && s2 == s3) {
+            cout << "💰 JACKPOT! +15 코인!\n";
+            coins += 15;
+        } else if (s1 == s2 || s2 == s3 || s1 == s3) {
+            cout << "👍 2개 일치! +4 코인!\n";
+            coins += 4;
+        } else {
+            cout << "😢 꽝! -5 코인 차감!\n";
+            coins -= 5;
+        }
+
+        // 승리 조건
+        if (coins >= 30) {
+            cout << "\n🎉 코인 30개 달성! 승리했습니다! (최종 코인 : " << coins << ")\n";
+            break;
+        }
+    }
+
+    if (coins <= 0)
+        cout << "\n💀 코인이 모두 소진되었습니다. 게임 종료!\n";
+
+    return 0;
+}
