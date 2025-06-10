@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>RPG 전투 게임</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      font-size: 15px;
+    }
+
+    #container {
+      display: flex;
+      gap: 20px;
+    }
+
+    
+    #log-area {
+      flex: 4;
+      background: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      height: 600px;
+      overflow-y: auto;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      white-space: pre-line;
+      text-align: center;
+    }
+
+    #game-area {
+      flex: 6;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 20px;
+    }
+
+    #left-panel {
+      flex: 2;
+      text-align: center;
+    }
+
+    #player-stats, #monster-stats {
+      text-align: center;
+    }
+
+    #player-stats span,
+    #monster-stats span {
+      font-weight: bold;
+      font-size: 17px;
+      color: #222;
+    }
+
+    #info-box {
+      flex: 1.8;
+      background: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+      height: auto;
+      max-height: 560px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    .section {
+      margin-bottom: 15px;
+    }
+
+    button {
+      margin: 5px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-action {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .btn-shop {
+      background-color: #28a745;
+      color: white;
+    }
+
+    button:hover {
+      opacity: 0.85;
+      transform: scale(1.06);
+      transition: all 0.2s ease-in-out;
+    }
+
+    .btn-action:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-shop:hover {
+      background-color: #1e7e34;
+    }
+
+    .bar-container {
+      width: 100%;
+      height: 12px;
+      background-color: #ddd;
+      border-radius: 5px;
+      margin: 4px 0;
+      overflow: hidden;
+    }
+
+    .hp-bar {
+      height: 100%;
+      background-color: #e74c3c;
+      width: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .mp-bar {
+      height: 100%;
+      background-color: #3498db;
+      width: 100%;
+      transition: width 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      #container {
+        flex-direction: column;
+      }
+      #game-area {
+        flex-direction: column;
+      }
+      #info-box {
+        max-height: 300px;
+      }
+      #log-area {
+        height: 300px;
+      }
+      h1 {
+        font-size: 20px;
+      }
+
+      .skill-button {
+      background-color: #ff6b6b;
+      color: white;
+      font-size: 16px;
+      padding: 10px 25px;
+      margin: 5px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: all 0.2s ease-in-out;
+      position: relative;
+    }
+
+    .skill-button:hover {
+      background-color: #e55050;
+      transform: scale(1.05);
+    }
+
+    .skill-button::after {
+      content: attr(title);
+      position: absolute;
+      white-space: pre;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 999;
+      width: max-content;
+      max-width: 200px;
+    }
+
+    .skill-button:hover::after {
+      opacity: 1;
+    }
+
+
+
+
+    }
+
+
+  </style>
+</head>
+<body>
+
+
+  
+  <h1 style="text-align:center;">🔥 RPG 전투 게임 🔥</h1>
+  <div style="text-align:center; margin-bottom: 20px;">
+    <label for="player-name-input">플레이어 이름 : </label>
+    <input type="text" id="player-name-input" placeholder="이름을 입력하세요">
+    <button onclick="setPlayerName()">설정 완료</button>
+  </div>
+
+  <div id="container">
+
+    <!-- 전투 로그 -->
+    <div id="log-area">
+      <strong>📜 전투 로그</strong>
+      <div id="log">
+        <div id="start-screen" style="margin-top: 100px;">
+          <button onclick="startGame()" style="
+            font-size: 24px;
+            padding: 15px 40px;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+          ">🎮 게임 시작 🎮
+            [ 이름을 입력하세요! ]</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 게임 영역 -->
+    <div id="game-area">
+      <div id="left-panel">
+        <div class="section">
+
+          <h3 id="player-name-display">🧙 플레이어 상태</h3>
+          <div id="player-stats">
+            HP : <span id="player-hp">100</span> /
+            MP : <span id="player-mp">100</span><br>
+            <div class="bar-container"><div id="hp-bar" class="hp-bar"></div></div>
+            <div class="bar-container"><div id="mp-bar" class="mp-bar"></div></div>
+            공격력 : <span id="player-atk">30</span><br>
+            치명타 확률 : <span id="player-crit">20%</span><br>
+            🟡 : <span id="player-coins">10</span><br>
+
+
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>👹 몬스터 상태</h3>
+          <div id="monster-stats">
+            이름 : <span id="monster-name">???</span><br>
+            HP : <span id="monster-hp">???</span><br>
+          <!-- 몬스터 상태 -->
+                <div id="monster-hp-bar-wrapper" style="display: none;">
+                  <div class="bar-container">
+                    <div id="monster-hp-bar" class="hp-bar"></div>
+                  </div>
+                </div>
+
+            공격력 : <span id="monster-atk">???</span><br>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>🎮 행동 선택</h3>
+          <button class="btn-action" onclick="basicAttack()" title="공격력의 30~40% 데미지" disabled>기본 공격</button>
+          <button class="btn-action" onclick="defend()" title="적 공격 1회 무효" disabled>방어</button>
+          <button class="btn-action" onclick="useSkill()" title="MP를 소모하여 스킬사용" disabled>스킬</button>
+          <button class="btn-action" onclick="useItem()" title="각종 아이템 사용" disabled>아이템</button>
+        </div>
+
+
+      <div id="skill-select" style="display:none; text-align:center; margin-top: 15px;">
+        <button
+        class="skill-button"
+        onclick="castFireball()"
+        id="fireball-btn"
+        title="MP-15 / 35~45% 피해 / 45% 확률로 화상"
+      >
+        🔥 화염구
+      </button>
+
+      <button
+        class="skill-button"
+        onclick="castThunder()"
+        id="thunder-btn"
+        title="MP-25 / 50~60% 피해 / 33% 확률로 감전"
+      >
+        ⚡ 뇌전
+      </button>
+
+      <button
+        class="skill-button"
+        onclick="castImprovise()"
+        id="improvise-btn"
+        title="MP-40 / 2턴간 행동불능, 무적"
+      >
+        🛡️ 임기응변
+      </button>
+
+        
+      <button
+          class="skill-button"
+          onclick="castSneakAttack()"
+          id="sneak-btn"
+          title="MP-15 / 15% 피해 / 약화 부여"
+        >
+          🗡️ 기습
+        </button>
+
+
+      </div>
+
+      <div id="item-select" style="display:none; text-align:center; margin-top: 15px;">
+        <button class="skill-button" onclick="useHpPotion()">🧪 HP 물약 (<span id="hp-potion-count">5</span>)</button>
+        <button class="skill-button" onclick="useMpPotion()">🔋 MP 물약 (<span id="mp-potion-count">5</span>)</button>
+        <button class="skill-button" onclick="useDumpling()">🥟 만두 (<span id="dumpling-count">3</span>)</button>
+      </div>
+
+
+
+        <div class="section">
+          <h3>💰 상점</h3>
+          <button class="btn-shop" onclick="openShop()" title="코인으로 아이템 및 스킬 구매" disabled>상점 열기</button>
+        </div>
+
+
+
+
+        
+      </div>
+
+      <!-- 설명서 박스 -->
+      <div id="info-box">
+        <strong>📘 게임 설명서</strong><br><br>
+        
+            <b>🎮 플레이어 정보</b><br>
+            - HP : 100 / MP: 100<br>
+            - 공격력 : 30<br>
+            - 치명타 확률 : 20%<br>
+            - 치명타 : 기본 데미지 + 50% 추가<br><br>
+
+            <b>🛠 선택지</b><br>
+            1. <b>기본 공격</b> : 공격력의 30% ~ 40% 데미지<br>
+            2. <b>방어</b> : 적 공격 1회 방어, 연속 사용 시 33% 확률로 사용<br>
+            3. <b>스킬</b> : MP를 소모해 다양한 효과 발동<br>
+            4. <b>아이템</b> : 물약 사용 또는 버프 적용<br><br>
+
+            <b>🎒 아이템 효과</b><br>
+            - HP 물약 : 최대 HP의 33% 회복<br>
+            - MP 물약 : 최대 MP의 33% 회복<br>
+            - 만두 : 3턴간 공격력 +15<br><br>
+
+            <b>🧱 전투 구조</b><br>
+            - 1~4라운드 : 몬스터 3회 처치 → 다음 라운드<br>
+            - 몬스터 처치 후 : 전투 / 휴식 / 모험 중 선택<br>
+            - 휴식 : HP, MP 50% 회복 (1회 제한)<br>
+            - 모험 : 갈림길 (50% 확률로 보상 or 패널티, 1회 제한)<br> 
+            &nbsp;&nbsp;&nbsp;└ 보상 : HP/MP 33% 회복 + 스킬 획득<br>
+            &nbsp;&nbsp;&nbsp;└ 패널티 : 최대 HP -20, MP -20<br>
+            - 다음 라운드 시 : 완전 회복 + 레벨업 + 스킬 획득<br>
+            - 5라운드 : 보스전<br><br>
+
+            <b>🆙 레벨업 효과</b><br>
+            - 최대 HP +30, 최대 MP +25, 공격력 +20<br><br>
+
+            <b>🏪 상점</b><br>
+          - 스킬 획득 : 🟡20 / 강화 : 🟡10<br>
+          - 스탯 업 : 🟡15 / 아이템 : 🟡5<br><br>
+
+            <b>⚔️ 몬스터 특징</b><br>
+            - 기본 치명타 확률 10% (50% 추가 피해)<br>
+            - 특정 몬스터는 특수 능력 또는 상태 돌입<br><br>
+
+            <b>💥 상태이상</b><br>
+            - 화상 : 3턴간 매턴 5 데미지<br>
+            - 감전 : 1턴 행동불능<br>
+            - 약화 : 1턴간 주는 데미지 - 50%<br>
+            - 위협 : 1턴간 받는 데미지 +30%<br><br>
+
+            <b>🔥 스킬 목록 (요약)</b><br>
+            - <b>화염구</b> : 데미지 35~45%, 화상 3턴<br>
+            - <b>뇌전</b> : 데미지 50~60%, 감전 1턴<br>
+            - <b>기습</b> : 데미지 15%, 약화 1턴<br>
+            - <b>임기응변</b> : 2턴 무적, 행동불가<br><br>
+
+            <b>💡 스킬 강화 효과</b>는 상점에서만 획득 가능<br>
+            - 화염구 강화: 데미지 ↑, 화상 지속 ↑<br>
+            - 뇌전 강화: 데미지 ↑, 쿨타임 ↓<br>
+            - 기습 강화: 치명타 감소까지 부여<br>
+            - 임기응변 강화: MP 감소, 쿨타임 감소<br></br>
+
+      </div>
+    </div>
+  </div>
+
+      <div class="section">
+        <h3>⏳ 현재 턴 : <span id="turn-count">0</span>턴</h3>
+      </div>
+
+
+</body>
+</html>
+
+
+
+<!-- HTML 맨 아래 -->
+<script src="game.js"></script>
