@@ -20,7 +20,7 @@ if (input) {
     }
 }
 
-    // 초기 상태로 몬스터 정보 숨기기
+    // 몬스터 정보 숨기기
     function initializeMonsterUI() {
     document.getElementById("monster-name").innerText = "???";
     document.getElementById("monster-hp").innerText = "???";
@@ -28,7 +28,6 @@ if (input) {
     document.getElementById("monster-hp-bar-wrapper").style.display = "none";
     }
 
-    // 페이지 로딩 직후 실행
     document.addEventListener("DOMContentLoaded", () => {
     initializeMonsterUI();
     });
@@ -58,13 +57,12 @@ function startGame() {
 
 
 
-    // ✅ 몬스터 HP 바 wrapper 보이게
+  
     document.getElementById("monster-hp-bar-wrapper").style.display = "block";
     updateMonsterHPBar(60, 60);
     logMessage(`🎮 ${playerName}님, 게임이 시작되었습니다!`);
-    loadNextMonster(); // 🔥 여기!
+    loadNextMonster();
 
-    // ✅ 버튼들 활성화
     const actionButtons = document.querySelectorAll("button.btn-action, button.btn-shop");
     actionButtons.forEach(btn => btn.disabled = false);
 
@@ -246,9 +244,9 @@ function startGame() {
         dmgRate: [0.25, 0.9],
         skill: {
             name: "야습",
-            interval: 3, // 3턴마다
+            interval: 3, 
             dmgRate: [0.25, 0.9],
-            effect: "threaten", // 위협 상태: 받는 데미지 30% 증가
+            effect: "threaten", 
         },
         },
     ],
@@ -264,7 +262,7 @@ function startGame() {
             heal: 30,
             atkBoost: 10,
             },
-            enragedTrigger: 0.5, // HP 50% 이하일 때
+            enragedTrigger: 0.5,
             enragedEffect: {
             extraDamageTaken: 15,
             extraDamageDealt: 15,
@@ -286,14 +284,14 @@ function startGame() {
     function loadNextMonster() {
     const monsters = monstersByRound[currentRound];
 
-    // 모든 몬스터 처치했을 때 → 다음 라운드로 이동
+
     if (currentMonsterIndex >= monsters.length) {
         logMessage(`🌟 라운드 ${currentRound} 완료! 다음 라운드로 넘어갑니다.`);
         currentRound++;
         currentMonsterIndex = 0;
 
         if (!player.level) player.level = 1;
-        player.level++;  // ✅ 1번만 레벨업
+        player.level++; 
 
         // 플레이어 능력치 증가
         player.maxHp += 30;
@@ -362,7 +360,7 @@ function startGame() {
     turnCount++;
     document.getElementById("turn-count").innerText = turnCount;
 
-    processTurnEffects(); // 매 턴마다 쿨타임 및 상태이상 처리
+    processTurnEffects(); 
 
     updateSkillCooldownUI();
 
@@ -377,14 +375,14 @@ function startGame() {
 
 
     function logMessage(message) {
-    const logContainer = document.getElementById("log");        // 메시지 담을 div
-    const logScrollArea = document.getElementById("log-area");  // 스크롤 영역
+    const logContainer = document.getElementById("log");        
+    const logScrollArea = document.getElementById("log-area"); 
 
     const p = document.createElement("p");
     p.innerText = message;
     logContainer.appendChild(p);
 
-    // ✅ 큰 바가 자동으로 내려가게
+
     logScrollArea.scrollTop = logScrollArea.scrollHeight;
     }
 
@@ -402,18 +400,18 @@ function startGame() {
 
 
 
-    //기본 공격
+
     function basicAttack() {
     if (player.noActionTurns > 0) {
         logMessage("[😶 무적 상태 중에는 행동할 수 없습니다.]");
         return;
     }
 
-    // 방어 봉인 해제
+
     defendAttemptCount = 0;
     defendLocked = false;
 
-    nextTurn(); // 턴 수 증가
+    nextTurn(); 
 
     const playerAtk = player.atk + player.buff.atkBonus;
     const monsterHpElement = document.getElementById("monster-hp");
@@ -443,7 +441,7 @@ function startGame() {
         return;
     }
 
-    // ✅ 몬스터 반격
+   
     setTimeout(enemyAttack, 500);
 }
 
@@ -454,7 +452,7 @@ function startGame() {
 
     //방어
     let defendAttemptCount = 0;
-    let defendLocked = false; // 방어 봉인 상태 (연속 3회 초과 시 true)
+    let defendLocked = false; 
 
 
     function defend() {
@@ -464,21 +462,21 @@ function startGame() {
     return;
     }
 
-    // 방어 봉인 상태일 경우 (턴 흐르지 않음)
+
     if (defendLocked) {
         logMessage(`⛔ 연속 방어 제한! 기본 공격 또는 스킬을 사용해야 다시 방어할 수 있습니다.`);
-        return; // 턴 증가 없음
+        return;
     }
 
-    nextTurn(); // 턴 증가
+    nextTurn(); 
 
     defendAttemptCount++;
 
-    // 연속 4회째 방어 시도 → 방어 봉인
+    // 연속 4회째 방어 시도
     if (defendAttemptCount > 3) {
         defendLocked = true;
         logMessage(`❌ 방어를 연속으로 4회 사용했습니다. 방어가 금지됩니다. 기본 공격 또는 스킬을 사용해 해제하세요.`);
-        return; // 이때도 방어 실패 처리되며 더 이상 진행 없음
+        return; 
     }
 
     // 확률 설정
@@ -500,7 +498,7 @@ function startGame() {
     }
 
     setTimeout(() => {
-        enemyAttack(); // 몬스터 반격
+        enemyAttack(); 
     }, 500);
 
     
@@ -554,7 +552,7 @@ function startGame() {
     }
 
 
-    // 스킬 UI 열기만 할 뿐 턴은 증가하지 않음
+  
     defendAttemptCount = 0;
     defendLocked = false;
 
@@ -640,10 +638,8 @@ function startGame() {
     function castThunder() {
     closeSkillUI();
 
-    // 💡 스킬 정보 초기화 (없을 경우 대비)
     player.skills.thunder = player.skills.thunder || { cooldown: 0, upgraded: false };
 
-    // ⏳ 쿨타임 중이면 사용 불가
     if (player.skills.thunder.cooldown > 0) {
         logMessage(`⏳ 뇌전은 ${player.skills.thunder.cooldown}턴 후 사용 가능합니다.`);
         return;
@@ -674,7 +670,7 @@ function startGame() {
         logMessage("[⚡ 몬스터 감전 됨! ]");
     }
 
-    // ⏲️ 쿨타임 설정
+   
     player.skills.thunder.cooldown = player.skills.thunder.upgraded ? 3 : 4;
     updateSkillCooldownUI();
 
@@ -702,7 +698,7 @@ function startGame() {
 
     const skill = player.skills.sneak;
 
-    // ⏳ 쿨타임 중일 경우 턴이 흐르지 않도록 early return
+  
     if (skill.cooldown > 0) {
         logMessage(`⏳ 기습은 ${skill.cooldown}턴 후 사용 가능합니다.`);
         return;
@@ -714,7 +710,7 @@ function startGame() {
         return;
     }
 
-    // ✅ 쿨타임, MP 체크 통과 후 턴 증가
+ 
     nextTurn();
 
     player.mp -= mpCost;
@@ -725,6 +721,8 @@ function startGame() {
     const damage = Math.floor(player.atk * rate);
     logMessage(`🗡️ 기습 공격! ${damage} 데미지`);
 
+
+        
     // 몬스터 HP 감소
     let hp = parseInt(document.getElementById("monster-hp").innerText);
     hp = Math.max(0, hp - damage);
@@ -738,7 +736,7 @@ function startGame() {
     logMessage(`[😈 몬스터 약화! ]`);
     if (skill.upgraded) logMessage(`📉 치명타 확률 감소! (3턴)`);
 
-    // ⏲️ 쿨타임 설정 및 UI 즉시 반영
+    // 쿨타임 설정
     skill.cooldown = 4;
     updateSkillCooldownUI();
 
@@ -778,12 +776,12 @@ function startGame() {
     player.noActionTurns = 2;
     logMessage(`[🛡️ 임기응변 발동! 2턴간 무적 / 행동금지 ]`);
 
-    player._wasInvincible = true; // ← 무적 상태를 기억
+    player._wasInvincible = true; 
 
     skill.cooldown = skill.upgraded ? 6 : 7;
     updateSkillCooldownUI();
 
-    // ⏩ 여기서 자동으로 2턴을 몬스터에게 넘김
+
     autoSkipTurnsDuringImprovise(2);
 }
 
@@ -792,18 +790,18 @@ function startGame() {
     function autoSkipTurnsDuringImprovise(turnsLeft) {
     if (turnsLeft <= 0 || player.hp <= 0) {
         logMessage(`🕐 무적 해제 / ${playerName}님의 턴 입니다 !`);
-        player._wasInvincible = false;  // 여기서도 플래그 초기화
+        player._wasInvincible = false; 
         return;
     }
 
-    nextTurn(); // 턴 수 증가 및 상태 처리
+    nextTurn(); 
 
     setTimeout(() => {
-        logMessage("💢 몬스터의 공격 !"); // 무적 상태 공격 알림
+        logMessage("💢 몬스터의 공격 !"); 
         logMessage("🛡️ 무적 상태 ! ");
 
         setTimeout(() => {
-            autoSkipTurnsDuringImprovise(turnsLeft - 1); // 다음 턴
+            autoSkipTurnsDuringImprovise(turnsLeft - 1); 
         }, 800);
     }, 500);
 }
@@ -824,12 +822,12 @@ function startGame() {
     const improvCd = player.skills.improvise.cooldown;
     improvBtn.innerText = improvCd > 0 ? `🛡️ 임기응변 (${improvCd})` : "🛡️ 임기응변";
 
-    // 🔥 화염구
+    // 화염구
     const fireballBtn = document.getElementById("fireball-btn");
     const fireballCd = player.skills.fireball?.cooldown || 0;
     fireballBtn.innerText = fireballCd > 0 ? `🔥 화염구 (${fireballCd})` : "🔥 화염구";
 
-    // ⚡ 뇌전
+    // 뇌전
     const thunderBtn = document.getElementById("thunder-btn");
     const thunderCd = player.skills.thunder?.cooldown || 0;
     thunderBtn.innerText = thunderCd > 0 ? `⚡ 뇌전 (${thunderCd})` : "⚡ 뇌전";
@@ -870,7 +868,7 @@ function startGame() {
         monsterStatus.burnTurn--;
         if (hp <= 0) {
             logMessage("🎉 몬스터가 화상으로 쓰러졌습니다!");
-            return true; // 죽음 처리
+            return true; 
         }
     }
 
@@ -878,7 +876,7 @@ function startGame() {
     if (monsterStatus.shockTurn > 0) {
         monsterStatus.shockTurn--;
         logMessage("⚡ 몬스터가 감전되어 움직이지 못합니다! ");
-        return true; // 공격 스킵
+        return true; 
     }
 
     // 약화 상태
@@ -887,11 +885,11 @@ function startGame() {
         monsterStatus.weakenTurn--;
     }
 
-    // 무적 해제 확인 → 로그만 출력하고 **false 반환**
+    // 무적 해제 확인
     if (player.noActionTurns === 0 && player._wasInvincible) {
         player._wasInvincible = false;
         logMessage(`🕐 무적 해제 / ${playerName}님의 턴 !`);
-        return true; // ❗여기서 true 반환하여 enemyAttack 강제 중단
+        return true; 
     }
 
     // 만두 버프 효과
@@ -900,7 +898,7 @@ function startGame() {
     if (player.buff.buffTurns === 0) {
         player.buff.atkBonus = 0;
         logMessage("🥟 만두 효과가 종료되었습니다.");
-        updatePlayerAtkText(); // 호출 추가
+        updatePlayerAtkText();
         }
 
     }
@@ -1022,6 +1020,10 @@ function startGame() {
     document.getElementById("hp-potion-count").innerText = player.items.hpPotion;
     document.getElementById("mp-potion-count").innerText = player.items.mpPotion;
     document.getElementById("dumpling-count").innerText = player.items.dumpling;
+
     }
+
+
+
 
 
