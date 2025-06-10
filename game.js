@@ -1,3 +1,5 @@
+//25.6.10 미완성
+
 let turnCount = 1;
 let playerName = "플레이어";
 let nameLocked = false;
